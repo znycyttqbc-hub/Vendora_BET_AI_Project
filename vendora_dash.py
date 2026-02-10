@@ -3,44 +3,45 @@ import streamlit as st
 st.set_page_config(page_title="VENDORA PRO LIVE", layout="wide")
 st.title("🏆 VENDORA PRO | Inteligentný Skener")
 
-team_name = st.text_input("Zadaj tím na hĺbkovú analýzu:", "Real Madrid")
+# Inštrukcia pre teba v aplikácii
+st.sidebar.info("TIP: Zadaj jeden tím pre celkovú formu, alebo dva (napr. Real Barcelona) pre vzájomné zápasy.")
 
-if st.button("🚀 SPUSTIŤ KOMPLETNÝ SKEN"):
-    # 1. ROZŠÍRENÁ TABUĽKA - 5 ZÁPASOV
-    st.subheader(f"🏟️ Posledných 5 spoločných zápasov (H2H) - {team_name}")
-    h2h_data = {
-        "Dátum": ["08.02.2026", "01.02.2026", "24.01.2026", "15.01.2026", "05.01.2026"],
-        "Súper": ["FC Barcelona", "Atlético Madrid", "Valencia CF", "Sevilla FC", "Athletic Bilbao"],
-        "Výsledok": ["2:1 ✅", "1:1 ➖", "3:0 ✅", "0:2 ❌", "2:0 ✅"],
-        "XG (Góly)": ["1.85", "1.20", "2.40", "0.90", "1.95"]
-    }
+search_query = st.text_input("Zadaj analýzu (tím alebo zápas):", "Real Madrid")
+
+if st.button("🚀 SPUSTIŤ INTELIGENTNÝ SKEN"):
+    # LOGIKA ROZPOZNANIA: Ak je v texte medzera a viac slov, berieme to ako H2H
+    query_parts = search_query.split()
+    is_h2h = len(query_parts) > 1
+
+    if is_h2h:
+        st.subheader(f"🏟️ Posledných 5 VZÁJOMNÝCH zápasov (H2H)")
+        # Simulácia 5 spoločných zápasov (napr. Real vs Barca)
+        h2h_data = {
+            "Dátum": ["12.01.2026", "28.10.2025", "21.04.2025", "14.01.2025", "26.10.2024"],
+            "Zápas": [f"{query_parts[0]} vs {query_parts[1]}", f"{query_parts[1]} vs {query_parts[0]}", f"{query_parts[0]} vs {query_parts[1]}", f"{query_parts[0]} vs {query_parts[1]}", f"{query_parts[1]} vs {query_parts[0]}"],
+            "Výsledok": ["2:1 ✅", "1:2 ❌", "3:2 ✅", "4:1 ✅", "1:2 ❌"]
+        }
+    else:
+        st.subheader(f"🏟️ Posledných 5 zápasov tímu {search_query}")
+        # Simulácia 5 posledných zápasov tímu celkovo
+        h2h_data = {
+            "Dátum": ["08.02.2026", "01.02.2026", "28.01.2026", "24.01.2026", "18.01.2026"],
+            "Súper": ["Súper A", "Súper B", "Súper C", "Súper D", "Súper E"],
+            "Výsledok": ["2:0 ✅", "1:1 ➖", "0:1 ❌", "3:1 ✅", "2:2 ➖"]
+        }
+    
     st.table(h2h_data)
 
     st.divider()
 
-    # 2. VNÚTORNÝ STAV TÍMOV (Kľúčové pre tvoj prehľad)
-    st.subheader("📋 Analýza stavu a pripravenosti")
-    col_a, col_b = st.columns(2)
-    
-    with col_a:
-        st.info(f"**Zdravotný stav {team_name}**")
-        st.write("⚠️ **Absencie:** Kľúčový stopér (karty), Útočník (otázny štart)")
-        st.write("✅ **Návraty:** Brankárska jednotka je späť v tréningu")
-        
-    with col_b:
-        st.info("**Faktory výkonu**")
-        st.write("🔥 **Motivácia:** Maximálna (priamy súboj o titul)")
-        st.write("💤 **Únava:** Vysoká (tretí zápas v priebehu 10 dní)")
+    # ANALÝZA STAVU (Zostáva zachovaná pre hĺbku)
+    st.subheader("📋 Aktuálna analýza faktorov")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Stav kádra:** ⚠️ 2 kľúčové absencie")
+        st.write("**Únava:** 💤 Stredná (6 dní od posledného zápasu)")
+    with col2:
+        st.metric("Pravdepodobnosť podľa formy", "64%" if not is_h2h else "52%")
+        st.write("**Verdikt:** " + ("Výhra domáci" if not is_h2h else "Opatrný tip na góly"))
 
-    st.divider()
-
-    # 3. UPRAVENÝ AI VERDIKT
-    st.subheader("🎯 Upravený AI Verdikt")
-    c1, c2, c3 = st.columns(3)
-    
-    # Percentá sú teraz 68% kvôli započítaniu únavy a absencií
-    c1.metric("Pravdepodobnosť výhry", "68%", delta="-4%", help="Znížené kvôli únave kľúčových hráčov")
-    c2.metric("Index Formy", "8.2 / 10")
-    c3.metric("Odporúčaný vklad", "Stredný")
-
-    st.success("Analýza je kompletná. Vendora ti kryje chrbát!")
+    st.success("Dáta boli spracované systémom Vendora.")
