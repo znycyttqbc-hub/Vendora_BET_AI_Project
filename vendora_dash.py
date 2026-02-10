@@ -5,8 +5,7 @@ st.set_page_config(page_title="VENDORA AI", layout="wide")
 st.title("⚽ VENDORA PRO ANALÝZA")
 
 # Tvoj aktívny kľúč
-client = ApifyClient("apify_api_98e0cXp1DqMstzF80r21QpX63G3WvC28pI34")
-
+client = ApifyClient("apify_api_6oFswe1Cie0gZpl06YmWT7ecySDjmX20d6Ur"
 team_name = st.text_input("Zadaj tím na analýzu:", "")
 
 if st.button("🚀 SPUSTIŤ ŽIVÝ SKEN"):
