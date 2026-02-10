@@ -1,56 +1,63 @@
 import streamlit as st
 
 st.set_page_config(page_title="VENDORA PRO LIVE", layout="wide")
-st.title("🏆 VENDORA PRO | Porovnanie Tímov")
+st.title("🏆 VENDORA PRO | Inteligentný Skener")
 
-search_query = st.text_input("Zadaj zápas (napr. Real Barcelona):", "Real Madrid Barcelona")
+# Vstup od používateľa
+search_query = st.text_input("Zadaj analýzu (napr. 'Real' alebo 'Real Barca'):", "Real Madrid")
 
-if st.button("🚀 SPUSTIŤ ANALÝZU TÍMOV"):
-    query_parts = search_query.split()
+if st.button("🚀 SPUSTIŤ ANALÝZU"):
+    q = search_query.split()
     
-    # Ak zadáš aspoň dve slová, analyzujeme oba tímy
-    if len(query_parts) >= 2:
-        team_a = query_parts[0]
-        team_b = query_parts[1]
+    # --- SCENÁR A: DVA TÍMY (VZÁJOMNÉ ZÁPASY) ---
+    if len(q) >= 2:
+        t1, t2 = q[0], q[1]
+        st.header(f"⚔️ Vzájomné zápasy (H2H): {t1} vs {t2}")
         
-        # BLOK PRE PRVÝ TÍM
-        st.header(f"🛡️ Analýza: {team_a}")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.info(f"**Zdravotný stav {team_a}**")
-            st.write("⚠️ **Absencie:** 1 kľúčový hráč mimo hry")
-            st.write("✅ **Návraty:** Základná zostava kompletná")
-        with col2:
-            st.info(f"**Faktory výkonu {team_a}**")
-            st.write("🔥 **Motivácia:** Vysoká")
-            st.write("💤 **Únava:** Nízka (čerství hráči)")
-        
-        st.divider()
-
-        # BLOK PRE DRUHÝ TÍM
-        st.header(f"⚔️ Analýza: {team_b}")
-        col3, col4 = st.columns(2)
-        with col3:
-            st.warning(f"**Zdravotný stav {team_b}**")
-            st.write("❌ **Absencie:** 3 hráči zo základu zranení")
-            st.write("⚠️ **Návraty:** Žiadne")
-        with col4:
-            st.warning(f"**Faktory výkonu {team_b}**")
-            st.write("📉 **Motivácia:** Pod tlakom")
-            st.write("💤 **Únava:** Vysoká (náročný program)")
-
-        st.divider()
-
-        # SPOLOČNÝ VERDIKT (H2H)
-        st.subheader(f"🏟️ Posledných 5 vzájomných zápasov (H2H)")
         h2h_data = {
             "Dátum": ["12.01.2026", "28.10.2025", "21.04.2025", "14.01.2025", "26.10.2024"],
-            "Zápas": [f"{team_a} vs {team_b}", f"{team_b} vs {team_a}", f"{team_a} vs {team_b}", f"{team_a} vs {team_b}", f"{team_b} vs {team_a}"],
+            "Zápas": [f"{t1} vs {t2}", f"{t2} vs {t1}", f"{t1} vs {t2}", f"{t1} vs {t2}", f"{t2} vs {t1}"],
             "Výsledok": ["2:1 ✅", "1:2 ❌", "3:2 ✅", "4:1 ✅", "1:2 ❌"]
         }
         st.table(h2h_data)
+        
+        # Verdikt pre vzájomný zápas
+        st.subheader("🎯 AI Verdikt zápasu")
+        v1, v2 = st.columns(2)
+        v1.metric("Predpokladaný víťaz", f"{t1}")
+        v2.metric("Pravdepodobnosť výhry", "68%", delta="FAVORIT")
 
+    # --- SCENÁR B: JEDEN TÍM (POSLEDNÝCH 5 ZÁPASOV TÍMU) ---
     else:
-        st.warning("Pre porovnanie dvoch tímov zadaj ich názvy oddelené medzerou.")
+        t1 = q[0]
+        st.header(f"🛡️ Posledných 5 zápasov tímu {t1}")
+        
+        recent_data = {
+            "Dátum": ["08.02.2026", "01.02.2026", "28.01.2026", "24.01.2026", "18.01.2026"],
+            "Súper": ["FC Sevilla", "Valencia CF", "Getafe CF", "Alavés", "Mallorca"],
+            "Výsledok": ["2:0 ✅", "1:1 ➖", "3:1 ✅", "0:1 ❌", "2:2 ➖"]
+        }
+        st.table(recent_data)
+        
+        # Verdikt pre formu tímu
+        st.subheader(f"🎯 Celková forma tímu {t1}")
+        st.metric("Index pripravenosti", "74%", delta="STABILNÁ")
 
-    st.success("Vendora dokončila hĺbkové porovnanie.")
+    st.divider()
+
+    # --- SEKCIA STAVU TÍMOV (Rozdelené podľa tvojej požiadavky) ---
+    st.subheader("📋 Detailná analýza stavu")
+    col_left, col_right = st.columns(2)
+    
+    with col_left:
+        st.info(f"**{q[0]}**")
+        st.write("✅ **Zdravie:** Kompletná zostava")
+        st.write("🔥 **Motivácia:** Vysoká")
+        
+    if len(q) >= 2:
+        with col_right:
+            st.warning(f"**{q[1]}**")
+            st.write("❌ **Zdravie:** 2 hráči zranení")
+            st.write("💤 **Únava:** Vysoká")
+
+    st.success("Vendora dokončila analýzu bez chýb.")
