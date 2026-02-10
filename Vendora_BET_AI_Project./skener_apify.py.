@@ -1,0 +1,32 @@
+from apify_client import ApifyClient
+
+client = ApifyClient('apify_api_qdgaxPsFBaKO6zt4QEYDq6bolVqO3Q0d4Sb8')
+
+def analyzuj_spravy():
+    try:
+        print("Pripájam sa k Apify s novým kľúčom...")
+
+        # Získame informácie o tvojom účte pre overenie
+        me = client.user().get()
+        print(f"✅ Úspešne prihlásený ako: {me['username']}")
+
+        # Získame posledný beh tvojho ESPN scrapera
+        last_run = client.actor("deloni/espn-football-news-scraper").last_run().get()
+        if not last_run:
+            print("❌ Nenašiel sa žiadny beh scrapera. Spusti ho na webe!")
+            return
+
+        # Stiahneme položky z datasetu
+        items = client.dataset(last_run['defaultDatasetId']).list_items().items
+
+        print(f"--- Nájdených správ: {len(items)} ---")
+
+        for idx, item in enumerate(items, 1):
+            print(f"{idx}. 📢 {item.get('Article_Title')}")
+            if 'injury' in item.get('Article_Content', '').lower():
+                print("   ⚠️ VAROVANIE: Zistené zranenie v článku!")
+
+    except Exception as error:
+        print(f"❌ Chyba: {error}")
+
+analyzuj_spravy()
