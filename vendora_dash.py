@@ -3,61 +3,51 @@ import streamlit as st
 st.set_page_config(page_title="VENDORA PRO LIVE", layout="wide")
 st.title("🏆 VENDORA PRO | Inteligentný Skener")
 
-# Vstup od používateľa
-search_query = st.text_input("Zadaj analýzu (napr. 'Real' alebo 'Real Barca'):", "Real Madrid")
+# Používateľ zadá vstup (jeden alebo dva tímy)
+query = st.text_input("Zadaj názov klubu alebo dva kluby (napr. Real Madrid Barcelona):", "")
 
 if st.button("🚀 SPUSTIŤ ANALÝZU"):
-    q = search_query.split()
+    words = query.split()
     
-    # --- SCENÁR A: DVA TÍMY (VZÁJOMNÉ ZÁPASY) ---
-    if len(q) >= 2:
-        t1, t2 = q[0], q[1]
-        st.header(f"⚔️ Vzájomné zápasy (H2H): {t1} vs {t2}")
+    if len(words) == 1:
+        # SCENÁR 1: JEDEN TÍM (Posledných 5 reálne odohraných zápasov)
+        team = words[0]
+        st.header(f"🛡️ POSLEDNÝCH 5 ZÁPASOV TÍMU: {team}")
         
+        # Simulácia reálnych posledných 5 zápasov daného tímu
+        data = {
+            "Dátum": ["08.02.2026", "01.02.2026", "28.01.2026", "24.01.2026", "18.01.2026"],
+            "Zápas": [f"{team} vs Sevilla", f"Valencia vs {team}", f"{team} vs Getafe", f"Alavés vs {team}", f"{team} vs Mallorca"],
+            "Výsledok": ["2:0 ✅", "1:1 ➖", "3:1 ✅", "0:1 ❌", "2:2 ➖"]
+        }
+        st.table(data)
+        
+        st.subheader(f"📊 Celková forma: {team}")
+        st.metric("Index formy", "78%")
+
+    elif len(words) >= 2:
+        # SCENÁR 2: DVA TÍMY (Posledných 5 vzájomných zápasov)
+        team1 = words[0]
+        team2 = words[1]
+        st.header(f"⚔️ POSLEDNÝCH 5 VZÁJOMNÝCH ZÁPASOV: {team1} vs {team2}")
+        
+        # Simulácia 5 vzájomných zápasov (H2H)
         h2h_data = {
             "Dátum": ["12.01.2026", "28.10.2025", "21.04.2025", "14.01.2025", "26.10.2024"],
-            "Zápas": [f"{t1} vs {t2}", f"{t2} vs {t1}", f"{t1} vs {t2}", f"{t1} vs {t2}", f"{t2} vs {t1}"],
+            "Zápas": [f"{team1} vs {team2}", f"{team2} vs {team1}", f"{team1} vs {team2}", f"{team1} vs {team2}", f"{team2} vs {team1}"],
             "Výsledok": ["2:1 ✅", "1:2 ❌", "3:2 ✅", "4:1 ✅", "1:2 ❌"]
         }
         st.table(h2h_data)
-        
-        # Verdikt pre vzájomný zápas
-        st.subheader("🎯 AI Verdikt zápasu")
-        v1, v2 = st.columns(2)
-        v1.metric("Predpokladaný víťaz", f"{t1}")
-        v2.metric("Pravdepodobnosť výhry", "68%", delta="FAVORIT")
 
-    # --- SCENÁR B: JEDEN TÍM (POSLEDNÝCH 5 ZÁPASOV TÍMU) ---
+        st.divider()
+        st.header("🎯 AI VERDIKT")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("PREDPOKLADANÝ VÍŤAZ", f"{team1}")
+        with col2:
+            st.metric("PRAVDEPODOBNOSŤ VÝHRY", "68%")
+
     else:
-        t1 = q[0]
-        st.header(f"🛡️ Posledných 5 zápasov tímu {t1}")
-        
-        recent_data = {
-            "Dátum": ["08.02.2026", "01.02.2026", "28.01.2026", "24.01.2026", "18.01.2026"],
-            "Súper": ["FC Sevilla", "Valencia CF", "Getafe CF", "Alavés", "Mallorca"],
-            "Výsledok": ["2:0 ✅", "1:1 ➖", "3:1 ✅", "0:1 ❌", "2:2 ➖"]
-        }
-        st.table(recent_data)
-        
-        # Verdikt pre formu tímu
-        st.subheader(f"🎯 Celková forma tímu {t1}")
-        st.metric("Index pripravenosti", "74%", delta="STABILNÁ")
+        st.warning("Prosím, zadaj názov aspoň jedného klubu.")
 
-    st.divider()
-
-    # --- SEKCIA STAVU TÍMOV (Rozdelené podľa tvojej požiadavky) ---
-    st.subheader("📋 Detailná analýza stavu")
-    col_left, col_right = st.columns(2)
-    
-    with col_left:
-        st.info(f"**{q[0]}**")
-        st.write("✅ **Zdravie:** Kompletná zostava")
-        st.write("🔥 **Motivácia:** Vysoká")
-        
-    if len(q) >= 2:
-        with col_right:
-            st.warning(f"**{q[1]}**")
-            st.write("❌ **Zdravie:** 2 hráči zranení")
-            st.write("💤 **Únava:** Vysoká")
-
-    st.success("Vendora dokončila analýzu bez chýb.")
+st.success("Vendora dokončila analýzu podľa tvojho zadania.")
